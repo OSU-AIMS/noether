@@ -486,13 +486,15 @@ ToolPaths PlaneVariableSlicerRasterPlanner::planImpl(const pcl::PolygonMesh& mes
   const Eigen::Vector3d cut_direction = dir_gen_->generate(mesh);
   const Eigen::Vector3d cut_normal = (cut_direction.normalized().cross(mesh_normal)).normalized();
 
+
   // Get the initial plane starting location
   const Eigen::Vector3d cut_origin = origin_gen_->generate(mesh);
 
   // std::vector<float> line_spacing_varied = {0.1, 0.5, 0.9, 0.3, 0.2};
-  float min_line_spacing = std::min_element(line_spacing_varied.begin(), line_spacing_varied.end()).operator*();
   auto num_planes = static_cast<std::size_t>(line_spacing_varied.size());
-  const Eigen::Vector3d start_loc = cut_origin + cut_normal * min_line_spacing;
+  std::cout << "Number of planes: " << num_planes << std::endl;
+  const Eigen::Vector3d start_loc = cut_origin;
+
   float distance_so_far = 0.0;
 
   // Generate each plane and collect the intersection points
@@ -521,6 +523,7 @@ ToolPaths PlaneVariableSlicerRasterPlanner::planImpl(const pcl::PolygonMesh& mes
 
     if (stripper->GetErrorCode() != vtkErrorCode::NoError)
     {
+      std::cout << "STRIPPER Error code: " << stripper->GetErrorCode() << std::endl;
       continue;
     }
 
@@ -560,6 +563,7 @@ ToolPaths PlaneVariableSlicerRasterPlanner::planImpl(const pcl::PolygonMesh& mes
 
     if (num_lines == 0)
     {
+      std::cout << "No lines found" << std::endl;
       continue;
     }
 
@@ -592,6 +596,7 @@ ToolPaths PlaneVariableSlicerRasterPlanner::planImpl(const pcl::PolygonMesh& mes
 
     if (raster_ids.empty())
     {
+    std::cout << "empty" << std::endl;
       continue;
     }
 
@@ -600,7 +605,6 @@ ToolPaths PlaneVariableSlicerRasterPlanner::planImpl(const pcl::PolygonMesh& mes
 
     // merging segments
     mergeRasterSegments(raster_lines->GetPoints(), min_hole_size_, raster_ids);
-
     for (auto& rpoint_ids : raster_ids)
     {
       // Populating with points
@@ -642,6 +646,7 @@ ToolPaths PlaneVariableSlicerRasterPlanner::planImpl(const pcl::PolygonMesh& mes
 
   // converting to poses msg now
   ToolPaths tool_paths = convertToPoses(rasters_data_vec);
+  std::cout << "Number of tool paths: " << tool_paths.size() << std::endl;
   return tool_paths;
 }
 
