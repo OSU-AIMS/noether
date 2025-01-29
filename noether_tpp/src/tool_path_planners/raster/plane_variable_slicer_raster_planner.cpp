@@ -477,18 +477,18 @@ ToolPaths PlaneVariableSlicerRasterPlanner::planImpl(const pcl::PolygonMesh& mes
     pcl::getMinMax3D(proj, min, max);
     Eigen::Array3f scales = max.getArray3fMap() - min.getArray3fMap();
 
+    std::cout << "SCALES: " << scales << std::endl;
     mesh_normal = pca.getEigenVectors().col(2).cast<double>().normalized();
     centroid = pca.getMean().head<3>().cast<double>();
     pca_vecs = (pca.getEigenVectors().array().rowwise() * scales.transpose()).cast<double>();
   }
 
   // Get the initial cutting plane
-  const Eigen::Vector3d cut_direction = dir_gen_->generate(mesh);
-  const Eigen::Vector3d cut_normal = (cut_direction.normalized().cross(mesh_normal)).normalized();
+  // const Eigen::Vector3d cut_normal = (cut_direction.normalized().cross(mesh_normal)).normalized();
 
 
   // Get the initial plane starting location
-  const Eigen::Vector3d cut_origin = origin_gen_->generate(mesh);
+  // const Eigen::Vector3d cut_origin = origin_gen_->generate(mesh);
 
   // std::vector<float> line_spacing_varied = {0.1, 0.5, 0.9, 0.3, 0.2};
   auto num_planes = static_cast<std::size_t>(line_spacing_varied.size());
@@ -663,6 +663,18 @@ ToolPathPlanner::ConstPtr PlaneVariableSlicerRasterPlannerFactory::create() cons
   return std::move(planner);
 }
 
+void PlaneVariableSlicerRasterPlanner::setDirectionVector(const Eigen::Vector3d& direction)
+{
+  cut_direction = (direction);
+}
+
+void PlaneVariableSlicerRasterPlanner::setNormalVector(const Eigen::Vector3d& normal)
+{
+  cut_normal = (normal);
+}
+
 void PlaneVariableSlicerRasterPlanner::setLineSpacing(std::vector<float> line_spacing) { line_spacing_varied = line_spacing; }
+
+void PlaneVariableSlicerRasterPlanner::setCutOrigin(const Eigen::Vector3d& origin) { cut_origin = origin; }
 
 }  // namespace noether

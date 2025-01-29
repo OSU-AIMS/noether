@@ -36,8 +36,17 @@ public:
 
   void setSearchRadius(const double search_radius);
   void setLineSpacing(std::vector<float> line_spacing);
+  void setDirectionVector(const Eigen::Vector3d& direction);
+  void setNormalVector(const Eigen::Vector3d& normal);
+  void setCutOrigin(const Eigen::Vector3d& origin);
   void setMinSegmentSize(const double min_segment_size);
   void generateRastersBidirectionally(const bool bidirectional);
+
+  Eigen::Vector3d cut_direction;
+
+  Eigen::Vector3d cut_normal;
+
+  Eigen::Vector3d cut_origin;
 
 protected:
   /**
